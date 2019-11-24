@@ -51,11 +51,11 @@ def patch_all():
     dulwich.walk._CommitTimeQueue = _CommitTimeQueuePatched
 
     class WalkerPatched(dulwich.walk.Walker):
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
+        def __init__(self, *args, queue_cls=None, **kwargs):
+            if queue_cls in (_CommitTimeQueueReal, None):
+                queue_cls = _CommitTimeQueuePatched
 
-            if isinstance(self._queue, _CommitTimeQueueReal):
-                self._queue = _CommitTimeQueuePatched(self)
+            super().__init__(*args, queue_cls=queue_cls, **kwargs)
 
     dulwich.walk.Walker = WalkerPatched
 
